@@ -10,6 +10,10 @@ Currently implemented:
 - lightmap resolution is corrected (?????);
 - everything is distributed automatically in the level outliner to separate VMF-generated from Unreal's entities
 
+![изображение](https://github.com/user-attachments/assets/f001186b-3869-4883-94c3-695ec32b5245)
+![изображение](https://github.com/user-attachments/assets/78012c3c-d2d4-4757-9250-9037cbbbbeeb)
+
+
 ![изображение](https://github.com/user-attachments/assets/377f5cbe-01e9-4be2-b2f8-ed3933bfc4e2)
 ![изображение](https://github.com/user-attachments/assets/039d42e0-5ea1-408f-b2cd-abe6638a8680)
 ![изображение](https://github.com/user-attachments/assets/ad4d3fce-dd26-4df3-891a-86427180dbe7)

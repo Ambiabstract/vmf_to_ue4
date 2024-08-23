@@ -14,9 +14,9 @@ solid_geometry_materials_create = False
 
 # REIMPORT BOOLS
 
-rebuild_solid_geometry_obj = False
-reimport_solid_geometry = False
-reimport_lights = False
+rebuild_solid_geometry_obj = True
+reimport_solid_geometry = True
+reimport_lights = True
 regenerate_textures = True
 reimport_materials = True
 

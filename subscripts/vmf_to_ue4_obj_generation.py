@@ -290,7 +290,7 @@ def find_plane_normal_from_list(vertices):
     return normal
 
 def convert_vmf_to_obj(vmf_content, vmf_path, default_units_scale, default_texture_scale):
-    unit_scale = 0.01*float(default_units_scale)/2
+    unit_scale = 1.00*float(default_units_scale)/1
     vmf_name = vmf_path.split('\\')[-1].split('.')[0]
     
     #log_and_print(f"Start convert_vmf_to_obj...\n")
@@ -827,7 +827,7 @@ def sg_to_vn(obj_file_path):
     #            f.write(f'{line}\n')
 
 def ucx_generation(vmf_content, vmf_path, default_units_scale):
-    unit_scale = 0.01*float(default_units_scale)/2
+    unit_scale = 1.00*float(default_units_scale)/1
     vmf_name = vmf_path.split('\\')[-1].split('.')[0]
     
     #log_and_print(f"Start convert_vmf_to_obj...\n")

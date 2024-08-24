@@ -6,7 +6,7 @@ import subprocess
 # MAIN SETTINGS
 
 gameconfig_path = r"C:\Program Files (x86)\Steam\steamapps\common\Half-Life 2\bin\hammerplusplus\hammerplusplus_gameconfig.txt" # used by hammer
-game_name = r"Atmus"            # game name, used by hammer per project
+game_name = r"Antenna"            # game name, used by hammer per project
 default_units_scale = 2         # hammer units to unreal centimeters, 128 hu wall height -> 256 cm w.h.
 lightmap_resolution = 256       # дефолт - 64, надо будет брать из люкселя наверное
 use_complex_cls_for_solid_geometry = False # player clip brushes ingored if true =(((( also makes bad performance((99
@@ -221,8 +221,40 @@ def set_collision_complexity_comp_as_simple(solid_geometry_subfolder_path):
             else:
                 print(f'No BodySetup found for {static_mesh.get_name()}')
 
+def rotate_obj_on_x_axis(obj_path, output_path):
+    """
+    Функция поворачивает все вершины и нормали OBJ-файла на 90 градусов по оси X.
+    """
+    with open(obj_path, 'r') as infile, open(output_path, 'w') as outfile:
+        for line in infile:
+            if line.startswith('v '):
+                # Обработка вершины
+                parts = line.split()
+                x = float(parts[1])
+                y = float(parts[2])
+                z = float(parts[3])
+                # Поворот на 90 градусов по оси X: (x, y, z) -> (x, -z, y)
+                new_line = f"v {x} {-z} {y}\n"
+                outfile.write(new_line)
+            elif line.startswith('vn '):
+                # Обработка нормали
+                parts = line.split()
+                nx = float(parts[1])
+                ny = float(parts[2])
+                nz = float(parts[3])
+                # Поворот на 90 градусов по оси X: (nx, ny, nz) -> (nx, -nz, ny)
+                new_line = f"vn {nx} {-nz} {ny}\n"
+                outfile.write(new_line)
+            else:
+                outfile.write(line)
 
 def import_obj_as_static_mesh(solid_geometry_subfolder_path, obj_path, lightmap_resolution):    
+    # Путь для временного повёрнутого OBJ-файла
+    rotated_obj_path = os.path.splitext(obj_path)[0] + '_rotated.obj'
+    
+    # Поворачиваем OBJ-файл на 90 градусов по X перед импортом
+    rotate_obj_on_x_axis(obj_path, rotated_obj_path)
+
     # Удаление старых ассетов основной геометрии уровня из контента
     delete_all_files_in_folder(solid_geometry_subfolder_path, recursive=True, include_folder=False)
     
@@ -236,8 +268,11 @@ def import_obj_as_static_mesh(solid_geometry_subfolder_path, obj_path, lightmap_
     import_settings.static_mesh_import_data.generate_lightmap_u_vs = True
     import_settings.static_mesh_import_data.auto_generate_collision = False
     import_settings.static_mesh_import_data.remove_degenerates = True
-    #import_settings.static_mesh_import_data.convert_scene = False
-    #import_settings.static_mesh_import_data.convert_scene_unit = False
+    
+    import_settings.static_mesh_import_data.convert_scene = True
+    import_settings.static_mesh_import_data.convert_scene_unit = True
+    import_settings.static_mesh_import_data.force_front_x_axis = True
+    
     import_settings.static_mesh_import_data.normal_import_method = unreal.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS_AND_TANGENTS
     
     # Отключение импорта материалов
@@ -246,7 +281,7 @@ def import_obj_as_static_mesh(solid_geometry_subfolder_path, obj_path, lightmap_
     
     # Создание задачи импорта
     task = unreal.AssetImportTask()
-    task.filename = obj_path
+    task.filename = rotated_obj_path  # Используем повёрнутую версию
     task.destination_path = solid_geometry_subfolder_path
     task.options = import_settings
     task.replace_existing = True
@@ -261,6 +296,9 @@ def import_obj_as_static_mesh(solid_geometry_subfolder_path, obj_path, lightmap_
         print("Import successful: ", task.imported_object_paths)
     else:
         print("Import failed")
+    
+    # Удаление временного файла, если он больше не нужен
+    os.remove(rotated_obj_path)
 
 def sub_vmf_to_ue4_obj_generation(gamedir_path, vmf_file_path, default_units_scale, default_texture_scale):
     # Path to the Python script to run
